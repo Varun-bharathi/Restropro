@@ -5,7 +5,7 @@ const { generateAccessToken, generateRefreshToken } = require("../utils/jwt");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const { deleteUserRefreshTokensDB, updateUserPasswordDB } = require("../services/user.service");
-const stripe = require('stripe')(CONFIG.STRIPE_SECRET);
+// const stripe = require('stripe')(CONFIG.STRIPE_SECRET);
 
 exports.signIn = async (req, res) => {
     try {
@@ -436,9 +436,9 @@ exports.cancelSubscription = async (req, res) => {
             });
         }
 
-        const subscription = await stripe.subscriptions.cancel(
-            id
-        );
+        // Mock subscription cancellation locally
+        await updateTenantSubscriptionAccess(user.username, 0, 'mock_sub_id', 'mock_cust_id', '2026-05-28', '2030-05-28');
+        await updateSubscriptionHistory(user.tenant_id, '2026-05-28', '2030-05-28', 'cancelled');
 
         // generate new access token
         // set cookie
@@ -481,34 +481,13 @@ exports.stripeProductSubscriptionLookup = async (req, res) => {
         const productId = req.body.id;
         const user = req.user;
 
-        // const prices = await stripe.prices.list({
-        //     lookup_keys: [productId],
-        //     expand: ['data.product'],
-        // });
-
-        // console.log(prices);
-
-        const session = await stripe.checkout.sessions.create({
-            billing_address_collection: 'auto',
-            customer_email: user.username,
-            metadata: {
-                tenant_id: user.tenant_id,
-            },
-            line_items: [
-                {
-                    price: productId,
-                    // price: prices.data[0].id,
-                    quantity: 1,
-                },
-            ],
-            mode: 'subscription',
-            success_url: `${CONFIG.FRONTEND_DOMAIN}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${CONFIG.FRONTEND_DOMAIN}/cancelled-payment`,
-        });
+        // Mock subscription activation directly for local development:
+        await updateTenantSubscriptionAccess(user.username, 1, 'mock_sub_id', 'mock_cust_id', '2026-05-28', '2030-05-28');
+        await updateSubscriptionHistory(user.tenant_id, '2026-05-28', '2030-05-28', 'created');
 
         return res.status(200).json({
             success: true,
-            url: session.url,
+            url: `${CONFIG.FRONTEND_DOMAIN}/success`
         });
     } catch (error) {
         console.log(error);

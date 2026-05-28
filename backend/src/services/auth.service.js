@@ -124,7 +124,7 @@ exports.signUpDB = async (bizName, username, password) => {
     const conn = await getMySqlPromiseConnection();
 
     try {
-        const [result] = await conn.query(`INSERT INTO tenants (name, is_active, subscription_id) VALUES (?, 0, null)`, [bizName])
+        const [result] = await conn.query(`INSERT INTO tenants (name, is_active, subscription_id) VALUES (?, 1, null)`, [bizName])
 
         const sql = `
         INSERT INTO users (username, password, name, role, tenant_id) VALUES (?, ?, ?, 'admin', ?);
