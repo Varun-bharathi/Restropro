@@ -1,0 +1,38 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+web_stage/
+
+# Build and distribution directories
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# Environment variables (highly sensitive)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+backend/.env
+frontend/.env
+
+# Debug and log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+logs/
+
+# System / OS files
+.DS_Store
+Thumbs.db
+
+# Temporary directories
+tmp/
+temp/
+.cache/
